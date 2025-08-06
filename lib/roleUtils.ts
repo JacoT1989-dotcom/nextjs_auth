@@ -33,7 +33,7 @@ export const roleRoutes: Record<UserRole, string> = {
   [UserRole.SUPERVISOR]: "/dashboard/supervisor",
   [UserRole.MODERATOR]: "/dashboard/moderator",
   [UserRole.EDITOR]: "/dashboard/editor",
-  [UserRole.USER]: "/dashboard/user",
+  [UserRole.USER]: "/dashboard",
   [UserRole.GUEST]: "/dashboard/guest",
   [UserRole.VIEWER]: "/dashboard/viewer",
 };
