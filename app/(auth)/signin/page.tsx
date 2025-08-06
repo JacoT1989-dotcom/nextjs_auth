@@ -2,7 +2,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 export default function SignIn() {
@@ -11,6 +12,9 @@ export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const message = searchParams.get("message");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,11 +22,18 @@ export default function SignIn() {
     setError("");
 
     try {
-      // TODO: Add sign in logic here
-      console.log("Sign in:", { email, password });
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
 
-      // Temporary success redirect
-      router.push("/dashboard");
+      if (result?.error) {
+        setError("Invalid email or password");
+      } else if (result?.ok) {
+        router.push("/dashboard");
+        router.refresh();
+      }
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -41,6 +52,12 @@ export default function SignIn() {
             Enter your email and password to continue
           </p>
         </div>
+
+        {message && (
+          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded text-sm text-center">
+            {message}
+          </div>
+        )}
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
