@@ -1,8 +1,12 @@
-// app/api/auth/signup/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { UserRole } from "@/lib/roleUtils";
+
+// Handle build-time execution
+if (process.env.NODE_ENV === "production" && !process.env.DATABASE_URL) {
+  console.warn("DATABASE_URL not available during build");
+}
 
 export async function POST(request: NextRequest) {
   try {
