@@ -1,4 +1,4 @@
-// app/(admin-dashboard)/layout.tsx
+// app\(moderator-dashboard)\layout.tsx
 "use client";
 
 import { useSession } from "next-auth/react";
@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { UserRole, hasPermission } from "@/lib/roleUtils";
 
-export default function AdminDashboardLayout({
+export default function ModeratorDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -22,7 +22,7 @@ export default function AdminDashboardLayout({
       return;
     }
 
-    if (!hasPermission(session.user.role, UserRole.ADMIN)) {
+    if (!hasPermission(session.user.role, UserRole.MODERATOR)) {
       router.push("/signin?error=insufficient_permissions");
       return;
     }
@@ -39,7 +39,7 @@ export default function AdminDashboardLayout({
     );
   }
 
-  if (!session || !hasPermission(session.user.role, UserRole.ADMIN)) {
+  if (!session || !hasPermission(session.user.role, UserRole.MODERATOR)) {
     return null; // Will redirect
   }
 
