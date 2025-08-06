@@ -1,11 +1,11 @@
-// app\(admin-dashboard)\dashboard\page.tsx
+// app\(supervisor-dashboard)\dashboard\page.tsx
 "use client";
 
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { UserRole, roleDescriptions } from "@/lib/roleUtils";
 
-export default function AdminDashboard() {
+export default function SuperVisorDashboard() {
   const { data: session } = useSession();
   const router = useRouter();
 
@@ -22,10 +22,10 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-center py-4">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
-                Admin Dashboard
+                SuperVisor Dashboard
               </h1>
               <p className="text-sm text-gray-600">
-                {roleDescriptions[UserRole.ADMIN]}
+                {roleDescriptions[UserRole.SUPERVISOR]}
               </p>
             </div>
             <div className="flex items-center space-x-4">
@@ -35,7 +35,7 @@ export default function AdminDashboard() {
                 </p>
                 <p className="text-xs text-gray-600">{session?.user?.email}</p>
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                  admin
+                  Supervisor
                 </span>
               </div>
               <button

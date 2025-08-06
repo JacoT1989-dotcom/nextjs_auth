@@ -1,4 +1,4 @@
-// app\(admin-dashboard)\dashboard\page.tsx
+// app\(manager-dashboard)\dashboard\manager\page.tsx
 "use client";
 
 import { useSession, signOut } from "next-auth/react";

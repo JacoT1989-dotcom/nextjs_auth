@@ -1,4 +1,4 @@
-// app/(admin-dashboard)/layout.tsx
+// app\(manager-dashboard)\layout.tsx
 "use client";
 
 import { useSession } from "next-auth/react";
