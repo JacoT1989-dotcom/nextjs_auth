@@ -31,7 +31,18 @@ export default function SignIn() {
       if (result?.error) {
         setError("Invalid email or password");
       } else if (result?.ok) {
-        router.push("/dashboard");
+        // Get user session to determine redirect
+        const response = await fetch("/api/auth/session");
+        const session = await response.json();
+
+        if (session?.user?.role) {
+          // Import role utils dynamically to avoid SSR issues
+          const { getRoleRedirectPath } = await import("@/lib/roleUtils");
+          const redirectPath = getRoleRedirectPath(session.user.role);
+          router.push(redirectPath);
+        } else {
+          router.push("/dashboard/user"); // fallback
+        }
         router.refresh();
       }
     } catch {

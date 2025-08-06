@@ -4,12 +4,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { UserRole, roleDescriptions } from "@/lib/roleUtils";
 
 export default function SignUp() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [role, setRole] = useState<UserRole>(UserRole.USER);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -31,7 +33,7 @@ export default function SignUp() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, role }),
       });
 
       const data = await response.json();
@@ -48,7 +50,6 @@ export default function SignUp() {
           ? error.message
           : "Something went wrong. Please try again.";
       setError(errorMessage);
-      setError("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -106,6 +107,32 @@ export default function SignUp() {
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Enter your email"
               />
+            </div>
+
+            <div>
+              <label
+                htmlFor="role"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Account Type
+              </label>
+              <select
+                id="role"
+                name="role"
+                value={role}
+                onChange={(e) => setRole(e.target.value as UserRole)}
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+              >
+                {Object.entries(UserRole).map(([key, value]) => (
+                  <option key={value} value={value}>
+                    {key.charAt(0) +
+                      key.slice(1).toLowerCase().replace(/_/g, " ")}
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1 text-xs text-gray-500">
+                {roleDescriptions[role]}
+              </p>
             </div>
 
             <div>

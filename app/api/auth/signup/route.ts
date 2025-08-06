@@ -2,10 +2,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { UserRole } from "@/lib/roleUtils";
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, email, password } = await request.json();
+    const { name, email, password, role } = await request.json();
 
     // Validate input
     if (!name || !email || !password) {
@@ -21,6 +22,12 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Validate role if provided
+    const userRole =
+      role && Object.values(UserRole).includes(role)
+        ? (role as UserRole)
+        : UserRole.USER;
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -43,11 +50,13 @@ export async function POST(request: NextRequest) {
         name,
         email,
         password: hashedPassword,
+        role: userRole,
       },
       select: {
         id: true,
         name: true,
         email: true,
+        role: true,
       },
     });
 
