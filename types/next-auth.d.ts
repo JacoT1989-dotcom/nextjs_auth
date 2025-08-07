@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import NextAuth from "next-auth";
 import { UserRole } from "@/lib/roleUtils";
+import { VerificationStatus } from "../app/generated/prisma";
 
 declare module "next-auth" {
   interface Session {
@@ -10,7 +11,7 @@ declare module "next-auth" {
       email?: string | null;
       image?: string | null;
       role: UserRole;
-      isVerifiedUser: boolean;
+      isVerifiedUser: VerificationStatus;
     };
   }
 
@@ -20,7 +21,7 @@ declare module "next-auth" {
     email?: string | null;
     image?: string | null;
     role: UserRole;
-    isVerifiedUser: boolean;
+    isVerifiedUser: VerificationStatus;
   }
 }
 
@@ -28,6 +29,6 @@ declare module "next-auth/jwt" {
   interface JWT {
     id: string;
     role: UserRole;
-    isVerifiedUser: boolean;
+    isVerifiedUser: VerificationStatus;
   }
 }

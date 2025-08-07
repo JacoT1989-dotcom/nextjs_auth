@@ -37,8 +37,8 @@ export default function SignInComponent() {
         const session = await response.json();
 
         if (session?.user) {
-          // Check if user is verified
-          if (!session.user.isVerifiedUser) {
+          // Check if user is approved by admin using string comparison
+          if (session.user.isVerifiedUser === "NOT_VERIFIED") {
             setNeedsVerification(true);
             setError("");
             return;
@@ -57,31 +57,6 @@ export default function SignInComponent() {
         } else {
           setError("Something went wrong. Please try again.");
         }
-      }
-    } catch {
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleResendVerification = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch("/api/auth/resend-verification", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      if (response.ok) {
-        setError("");
-        setNeedsVerification(false);
-        alert("Verification email sent! Please check your inbox.");
-      } else {
-        setError("Failed to send verification email. Please try again.");
       }
     } catch {
       setError("Something went wrong. Please try again.");
@@ -135,19 +110,19 @@ export default function SignInComponent() {
         {needsVerification && (
           <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded text-sm">
             <div className="text-center mb-3">
-              <strong>Account Not Verified</strong>
+              <strong>Account Pending Approval</strong>
             </div>
             <p className="text-center mb-4">
-              Your account needs to be verified before you can access the
-              dashboard. Please check your email for a verification link.
+              Your account is waiting for admin approval. Please contact your
+              administrator or wait for approval to access your dashboard.
             </p>
             <div className="text-center">
               <button
-                onClick={handleResendVerification}
+                onClick={() => window.location.reload()}
                 disabled={isLoading}
                 className="inline-flex items-center px-3 py-1 border border-yellow-300 text-sm font-medium rounded-md text-yellow-800 bg-yellow-100 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? "Sending..." : "Resend Verification Email"}
+                Check Approval Status
               </button>
             </div>
           </div>
