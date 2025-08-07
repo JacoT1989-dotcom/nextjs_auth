@@ -61,6 +61,7 @@ export const authOptions: NextAuthOptions = {
             email: user.email,
             name: user.name,
             role: user.role as UserRole,
+            isVerifiedUser: user.isVerifiedUser,
           };
         } catch (error) {
           console.log("Auth error:", error);
@@ -79,13 +80,15 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.role = user.role;
+        token.isVerifiedUser = user.isVerifiedUser;
       }
       return token;
     },
     async session({ session, token }) {
       if (token && session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as UserRole;
+        session.user.id = token.id;
+        session.user.role = token.role;
+        session.user.isVerifiedUser = token.isVerifiedUser;
       }
       return session;
     },

@@ -10,6 +10,7 @@ export default function SignInComponent() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [needsVerification, setNeedsVerification] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -19,6 +20,7 @@ export default function SignInComponent() {
     e.preventDefault();
     setIsLoading(true);
     setError("");
+    setNeedsVerification(false);
 
     try {
       const result = await signIn("credentials", {
@@ -34,15 +36,52 @@ export default function SignInComponent() {
         const response = await fetch("/api/auth/session");
         const session = await response.json();
 
-        if (session?.user?.role) {
-          // Import role utils dynamically to avoid SSR issues
-          const { getRoleRedirectPath } = await import("@/lib/roleUtils");
-          const redirectPath = getRoleRedirectPath(session.user.role);
-          router.push(redirectPath);
+        if (session?.user) {
+          // Check if user is verified
+          if (!session.user.isVerifiedUser) {
+            setNeedsVerification(true);
+            setError("");
+            return;
+          }
+
+          // User is verified, proceed with normal redirect
+          if (session.user.role) {
+            // Import role utils dynamically to avoid SSR issues
+            const { getRoleRedirectPath } = await import("@/lib/roleUtils");
+            const redirectPath = getRoleRedirectPath(session.user.role);
+            router.push(redirectPath);
+          } else {
+            router.push("/dashboard/user"); // fallback
+          }
+          router.refresh();
         } else {
-          router.push("/dashboard/user"); // fallback
+          setError("Something went wrong. Please try again.");
         }
-        router.refresh();
+      }
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/auth/resend-verification", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (response.ok) {
+        setError("");
+        setNeedsVerification(false);
+        alert("Verification email sent! Please check your inbox.");
+      } else {
+        setError("Failed to send verification email. Please try again.");
       }
     } catch {
       setError("Something went wrong. Please try again.");
@@ -90,6 +129,27 @@ export default function SignInComponent() {
         {message && (
           <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded text-sm text-center">
             {message}
+          </div>
+        )}
+
+        {needsVerification && (
+          <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded text-sm">
+            <div className="text-center mb-3">
+              <strong>Account Not Verified</strong>
+            </div>
+            <p className="text-center mb-4">
+              Your account needs to be verified before you can access the
+              dashboard. Please check your email for a verification link.
+            </p>
+            <div className="text-center">
+              <button
+                onClick={handleResendVerification}
+                disabled={isLoading}
+                className="inline-flex items-center px-3 py-1 border border-yellow-300 text-sm font-medium rounded-md text-yellow-800 bg-yellow-100 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? "Sending..." : "Resend Verification Email"}
+              </button>
+            </div>
           </div>
         )}
 
